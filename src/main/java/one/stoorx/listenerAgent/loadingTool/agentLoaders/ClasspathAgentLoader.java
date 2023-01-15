@@ -2,10 +2,7 @@ package one.stoorx.listenerAgent.loadingTool.agentLoaders;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import one.stoorx.listenerAgent.loadingTool.exceptions.AgentLoadFailedException;
 import one.stoorx.listenerAgent.loadingTool.parameters.AgentLoadParameters;
 
@@ -13,10 +10,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -27,13 +26,28 @@ public class ClasspathAgentLoader implements AgentLoader {
     @NonNull
     private Class<?> agentClass;
 
-    private File createFakeJar() throws IOException {
+    private File createFakeJar() throws IOException, URISyntaxException {
         File agentFakeJar = Files.createTempFile(null, ".jar").toFile();
         var zipOutputStream = new ZipOutputStream(new FileOutputStream(agentFakeJar));
 
-        putToJar(zipOutputStream, new ZipEntry(
-                        agentClass.getName().replace('.', '/') + ".class"),
-                Files.readAllBytes(Path.of(getUri())));
+        var classPath = Path.of(agentClass.getProtectionDomain().getCodeSource().getLocation().toURI());
+        //noinspection Convert2Lambda
+        Files.walk(classPath)
+                .filter(path -> !Files.isDirectory(path))
+                .forEach(
+                        new Consumer<>() {
+                            @Override
+                            @SneakyThrows(IOException.class)
+                            public void accept(Path path) {
+                                putToJar(
+                                        zipOutputStream,
+                                        new ZipEntry(classPath.relativize(path).toString()
+                                                .replace('\\', '/')),
+                                        Files.readAllBytes(path)
+                                );
+                            }
+                        }
+                );
 
         putToJar(zipOutputStream, new ZipEntry("META-INF/MANIFEST.MF"),
                 prepareManifest(
@@ -50,7 +64,7 @@ public class ClasspathAgentLoader implements AgentLoader {
         try {
             agentLoadParameters.virtualMachine()
                     .loadAgent(createFakeJar().getAbsolutePath(), agentLoadParameters.options());
-        } catch (IOException | AgentLoadException | AgentInitializationException e) {
+        } catch (IOException | AgentLoadException | AgentInitializationException | URISyntaxException e) {
             throw new AgentLoadFailedException(this, e);
         }
     }
