@@ -1,5 +1,6 @@
 plugins {
     java
+    id("io.freefair.lombok") version "6.6.1"
 }
 
 group = "one.stoorx"
@@ -16,4 +17,14 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Premain-Class" to "one.stoorx.listenerAgent.StubAgent",
+            "Agent-Class" to "one.stoorx.listenerAgent.StubAgent",
+            "Main-Class" to "one.stoorx.listenerAgent.loadingTool.AgentLoadingTool"
+        )
+    }
 }
