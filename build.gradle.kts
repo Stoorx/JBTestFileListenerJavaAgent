@@ -11,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.ow2.asm:asm:9.4")
+    implementation("org.ow2.asm:asm-commons:9.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
@@ -22,9 +24,10 @@ tasks.getByName<Test>("test") {
 tasks.jar {
     manifest {
         attributes(
-            "Premain-Class" to "one.stoorx.listenerAgent.StubAgent",
-            "Agent-Class" to "one.stoorx.listenerAgent.StubAgent",
-            "Main-Class" to "one.stoorx.listenerAgent.loadingTool.AgentLoadingTool"
+            "Premain-Class" to "one.stoorx.listenerAgent.ListenerAgent",
+            "Agent-Class" to "one.stoorx.listenerAgent.ListenerAgent",
+            "Main-Class" to "one.stoorx.listenerAgent.loadingTool.AgentLoadingTool",
+            "Can-Retransform-Classes" to "true"
         )
     }
 }
