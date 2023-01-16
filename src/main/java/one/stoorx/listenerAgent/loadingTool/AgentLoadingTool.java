@@ -3,7 +3,7 @@ package one.stoorx.listenerAgent.loadingTool;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import lombok.SneakyThrows;
-import one.stoorx.listenerAgent.StubAgent;
+import one.stoorx.listenerAgent.ListenerAgent;
 import one.stoorx.listenerAgent.loadingTool.agentLoaders.AgentLoader;
 import one.stoorx.listenerAgent.loadingTool.exceptions.AttachException;
 import one.stoorx.listenerAgent.loadingTool.parameters.AgentLoadParameters;
@@ -39,7 +39,7 @@ public class AgentLoadingTool {
     private void run() {
         var vm = attachToVm();
         try {
-            AgentLoader.ofClass(StubAgent.class).loadWith(new AgentLoadParameters(vm, utilityParameters.options()));
+            AgentLoader.ofClass(ListenerAgent.class).loadWith(new AgentLoadParameters(vm, utilityParameters.options()));
         } finally {
             vm.detach();
         }
