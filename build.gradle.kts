@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
     id("io.freefair.lombok") version "6.6.1"
@@ -19,18 +21,26 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.jar {
-    manifest {
-        attributes(
-            "Premain-Class" to "one.stoorx.listenerAgent.ListenerAgent",
-            "Agent-Class" to "one.stoorx.listenerAgent.ListenerAgent",
-            "Main-Class" to "one.stoorx.listenerAgent.loadingTool.AgentLoadingTool",
-            "Can-Retransform-Classes" to "true",
-            "Boot-Class-Path" to "JBTestFileListenerJavaAgent-1.0-SNAPSHOT-all.jar agent.jar"
-        )
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveFileName.set("agent.jar")
+        manifest {
+            attributes(
+                "Premain-Class" to "one.stoorx.listenerAgent.ListenerAgent",
+                "Agent-Class" to "one.stoorx.listenerAgent.ListenerAgent",
+                "Main-Class" to "one.stoorx.listenerAgent.loadingTool.AgentLoadingTool",
+                "Can-Retransform-Classes" to "true",
+                "Boot-Class-Path" to "agent.jar"
+            )
+        }
     }
 }
