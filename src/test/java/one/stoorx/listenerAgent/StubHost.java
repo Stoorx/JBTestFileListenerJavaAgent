@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 
 public class StubHost {
     public static void main(String[] args) throws IOException {
-        Files.readString(Paths.get("gradlew"));
-        Files.readAllBytes(Paths.get("gradle/wrapper/gradle-wrapper.jar"));
+        Files.readString(Paths.get("a.txt"));
     }
 }
