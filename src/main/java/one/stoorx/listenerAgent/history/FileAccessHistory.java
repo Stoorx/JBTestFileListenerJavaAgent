@@ -1,23 +1,23 @@
 package one.stoorx.listenerAgent.history;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public enum FileAccessHistory {
     INSTANCE;
 
-    private final List<FileAccessRecord> history = new ArrayList<>();
+    private final Queue<FileAccessRecord> history = new ConcurrentLinkedQueue<>();
 
-    public synchronized void clear() {
+    public void clear() {
         history.clear();
     }
 
-    public synchronized List<FileAccessRecord> getHistory() {
-        return Collections.unmodifiableList(history);
+    public List<FileAccessRecord> getHistory() {
+        return history.stream().toList();
     }
 
-    public synchronized void registerAccess(FileAccessRecord fileAccessRecord) {
+    public void registerAccess(FileAccessRecord fileAccessRecord) {
         history.add(fileAccessRecord);
     }
 }
