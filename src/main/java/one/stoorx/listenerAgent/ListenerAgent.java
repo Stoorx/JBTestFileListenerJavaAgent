@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import one.stoorx.listenerAgent.history.FileAccessHistory;
 import one.stoorx.listenerAgent.transformers.ProcessChainClassTransformer;
 import one.stoorx.listenerAgent.transformers.impl.FileInputStreamTransformationSpec;
+import one.stoorx.listenerAgent.transformers.impl.RandomAccessFileTransformationSpec;
 import one.stoorx.listenerAgent.transformers.impl.WindowsFileSystemProviderTransformationSpec;
 
 import java.lang.instrument.Instrumentation;
@@ -43,7 +44,8 @@ public class ListenerAgent {
     private void installTransformers() {
         var transformer = new ProcessChainClassTransformer(
                 new WindowsFileSystemProviderTransformationSpec(),
-                new FileInputStreamTransformationSpec()
+                new FileInputStreamTransformationSpec(),
+                new RandomAccessFileTransformationSpec()
         );
 
         instrumentation.addTransformer(transformer, true);
