@@ -6,10 +6,9 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
 import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -24,13 +23,10 @@ public class ProcessChainClassTransformer implements ClassFileTransformer {
     }
 
     @SneakyThrows
-    public List<Class<?>> getTransformableClasses() {
-        List<Class<?>> list = new ArrayList<>();
-        for (String s : classTransformationSpecMap.keySet()) {
-            Class<?> aClass = Class.forName(s);
-            list.add(aClass);
-        }
-        return list;
+    public Class<?>[] getTransformableClasses(Instrumentation instrumentation) {
+        return Arrays.stream(instrumentation.getAllLoadedClasses())
+                .filter(aClass -> classTransformationSpecMap.containsKey(aClass.getName()))
+                .toArray(Class[]::new);
     }
 
     @SneakyThrows

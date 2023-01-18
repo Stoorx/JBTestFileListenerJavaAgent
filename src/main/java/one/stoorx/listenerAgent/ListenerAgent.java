@@ -49,6 +49,6 @@ public class ListenerAgent {
         );
 
         instrumentation.addTransformer(transformer, true);
-        instrumentation.retransformClasses(transformer.getTransformableClasses().toArray(Class[]::new));
+        instrumentation.retransformClasses(transformer.getTransformableClasses(instrumentation));
     }
 }
